@@ -1,0 +1,6 @@
+First {
+    var five=5
+    print five
+    var dupa="dupa1212"
+    print dupa
+}
