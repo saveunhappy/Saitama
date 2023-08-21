@@ -1,8 +1,13 @@
 plugins {
     id 'java'
 }
+apply plugin: 'java'
+apply plugin: 'antlr'
+
+sourceCompatibility = 1.8
 
 group = 'com.saveunhappy.saitama'
+version = '1.0.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
