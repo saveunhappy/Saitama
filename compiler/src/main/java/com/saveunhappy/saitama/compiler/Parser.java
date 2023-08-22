@@ -15,9 +15,13 @@ import java.io.IOException;
 
 public class Parser {
     public CompilationUnit getCompilationUnit(String fileAbsolutePath) throws IOException {
+        //读取文件的内容
         CharStream charStream = new ANTLRFileStream(fileAbsolutePath);
+        //词法分析
         SaitamaLexer lexer = new SaitamaLexer(charStream);
+        //解析token
         CommonTokenStream tokenStream = new CommonTokenStream(lexer);
+        //进行解析，这个时候就已经有抽象语法树了。
         SaitamaParser parser = new SaitamaParser(tokenStream);
 
         ANTLRErrorListener errorListener = new SaitamaTreeWalkErrorListener();
