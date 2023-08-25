@@ -2,8 +2,8 @@ package com.saveunhappy.saitama.compiler.visitor;
 
 import com.saveunhappy.saitama.antlr.SaitamaBaseVisitor;
 import com.saveunhappy.saitama.antlr.SaitamaParser;
-import com.saveunhappy.saitama.compiler.bytecodegeneration.ClassDeclaration;
-import com.saveunhappy.saitama.compiler.bytecodegeneration.CompilationUnit;
+import com.saveunhappy.saitama.compiler.domain.global.ClassDeclaration;
+import com.saveunhappy.saitama.compiler.domain.global.CompilationUnit;
 
 public class CompilationUnitVisitor extends SaitamaBaseVisitor<CompilationUnit> {
 

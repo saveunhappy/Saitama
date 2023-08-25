@@ -1,0 +1,13 @@
+Second {
+        void main (string[] args) {
+            var x = "Hello function call"
+            var y = 1
+            foo(x , y)
+        }
+
+        void foo (string a, int b) {
+            print a
+            print b
+        }
+
+}

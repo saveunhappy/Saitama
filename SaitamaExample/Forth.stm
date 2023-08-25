@@ -1,6 +1,6 @@
-First {
+Forth {
         void main (string[] args) {
-            var result = 5 * 3 / 2 + 1 - 2
+            var result = 5 / 2 * 3
             print result
         }
 }

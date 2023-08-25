@@ -1,11 +1,12 @@
 package com.saveunhappy.saitama.compiler;
 
-import com.saveunhappy.saitama.compiler.bytecodegeneration.CompilationUnit;
+import com.saveunhappy.saitama.compiler.bytecodegenerator.BytecodeGenerator;
+import com.saveunhappy.saitama.compiler.domain.global.CompilationUnit;
+import com.saveunhappy.saitama.compiler.validation.ARGUMENT_ERRORS;
 import org.apache.commons.io.IOUtils;
 import org.objectweb.asm.Opcodes;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
@@ -17,7 +18,8 @@ import java.nio.file.Paths;
 public class Compiler implements Opcodes {
 
     public static void main(String[] args) {
-        String[] sourceCodeLocation = {"SaitamaExample/First.stm"};
+        //String[] sourceCodeLocation = {"SaitamaExample/First.stm","SaitamaExample/Second.stm","SaitamaExample/Third.stm","SaitamaExample/Forth.stm"};
+        String[] sourceCodeLocation = {"SaitamaExample/Second.stm"};
         try {
             new Compiler().compile(sourceCodeLocation);
         } catch (Exception e) {
@@ -50,8 +52,8 @@ public class Compiler implements Opcodes {
     }
 
     private static void saveBytecodeToClassFile(CompilationUnit compilationUnit) throws IOException {
-        //这个方法其实应该是void，但是要返回字节码，所以返回字节
-        final byte[] byteCode = compilationUnit.getByteCode();
+        BytecodeGenerator bytecodeGenerator = new BytecodeGenerator();
+        final byte[] byteCode = bytecodeGenerator.generate(compilationUnit);
         String className = compilationUnit.getClassName();
         String fileName = className + ".class";
         OutputStream os = Files.newOutputStream(Paths.get(fileName));
