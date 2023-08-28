@@ -30,12 +30,18 @@ public class FunctionVisitor extends SaitamaBaseVisitor<Function> {
         //获取方法的返回值类型
         Type returnType = getReturnType(ctx);
         //获取所有的参数的名字和类型，并且做了一件事，添加到那个方法的作用域中，作为变量使用
-        //确实也就应该这么做
+        //确实也就应该这么做，这个scope中就是有localVariable的集合，
         List<FunctionParameter> arguments = getArguments(ctx);
-        List<Statement> instructions = getStatements(ctx);
-        return new Function(scope, name, returnType, arguments, instructions);
-    }
+        Statement block = getBlock(ctx);
 
+        return new Function( name, returnType, arguments, block);
+    }
+    private Statement getBlock(SaitamaParser.FunctionContext functionContext) {
+        //这个时候的scope中已经有了变量，然后给了这个visitor.
+        StatementVisitor statementVisitor = new StatementVisitor(scope);
+        SaitamaParser.BlockContext blockContext = functionContext.block();
+        return blockContext.accept(statementVisitor);
+    }
     private String getName(SaitamaParser.FunctionContext functionDeclarationContext) {
         return functionDeclarationContext.functionDeclaration().functionName().getText();
     }
@@ -54,10 +60,4 @@ public class FunctionVisitor extends SaitamaBaseVisitor<Function> {
         return parameters;
     }
 
-    private List<Statement> getStatements(@NotNull SaitamaParser.FunctionContext ctx) {
-        StatementVisitor statementVisitor = new StatementVisitor(scope);
-        return ctx.blockStatement().stream()
-                .map(block -> block.accept(statementVisitor))
-                .collect(Collectors.toList());
-    }
 }

@@ -11,6 +11,13 @@ import java.util.Optional;
 
 public class TypeResolver {
     public static Type getFromTypeName(SaitamaParser.TypeContext typeContext) {
+        /**
+         *      main(string[] args) {
+         *         print sum(5,2, 1)
+         *     }
+         *     这样子typeContext就是空,然后就是void类型的
+         * */
+
         if (typeContext == null) return BuiltInType.VOID;
         String typeName = typeContext.getText();
         if (typeName.equals("java.lang.String")) return BuiltInType.STRING;

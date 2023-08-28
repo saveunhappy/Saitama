@@ -14,10 +14,10 @@ className : ID ;
 //类的内容，目前是只有方法0个或者是多个
 classBody :  function* ;
 //方法声明，方法体
-function : functionDeclaration '{' (blockStatement)* '}' ;
+function : functionDeclaration block;
 //functionDeclaration : (type)? functionName '('(functionArgument)*')' ;
 //返回值类型（可选） 方法名，参数列表，可以是多个
-functionDeclaration : (type)? functionName '('  (functionArgument)* (',' functionArgument)* ')' ;
+functionDeclaration : (type)? functionName '(' (functionArgument (',' functionArgument)*)?')' ;
 //方法名
 functionName : ID ;
 //方法参数，String a;可以有默认值，比如String a = "a"
@@ -40,18 +40,25 @@ primitiveType :  'boolean' ('[' ']')*
                 |   'void' ('[' ']')* ;
 classType : QUALIFIED_NAME ('[' ']')* ;
 //语句中可以有变量的声明，打印变量还有函数调用
-blockStatement : variableDeclaration
+block : '{' statement* '}' ;
+
+statement :     block
+               | variableDeclaration
                | printStatement
-               | functionCall ;
+               | functionCall
+               | returnStatement;
 //var a = 1
 variableDeclaration : VARIABLE name EQUALS expression;
 //print a  print 1
 printStatement : PRINT expression ;
+
+returnStatement : 'return' #RETURNVOID
+                | ('return')? expression #RETURNWITHVALUE ;
 //函数调用
 functionCall : functionName '('expressionList ')';
 name : ID ;
 //参数列表
-expressionList : expression (',' expression)* ;
+expressionList : expression? (',' expression)* ;
 
 expression : variableReference #VarReference
            | value        #ValueExpr
@@ -73,7 +80,7 @@ VARIABLE : 'var' ;
 PRINT : 'print' ;
 EQUALS : '=' ;
 NUMBER : [0-9]+ ;
-STRING : '"'.*?'"' ;
+STRING : '"'~('\r' | '\n' | '"')*'"' ;
 ID : [a-zA-Z0-9]+ ;
 QUALIFIED_NAME : ID ('.' ID)+;
 WS: [ \t\n\r]+ -> skip ;

@@ -113,6 +113,10 @@ public class ExpressionGenerator {
         methodVisitor.visitInsn(Opcodes.IDIV);
     }
 
+    public void generate(EmptyExpression expression) {
+        System.out.println("do nothing,asm deal");
+        // do nothing
+    }
     private void evaluateArthimeticComponents(ArthimeticExpression expression) {
         Expression leftExpression = expression.getLeftExpression();
         Expression rightExpression = expression.getRightExpression();

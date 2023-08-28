@@ -28,6 +28,10 @@ generateGrammarSource {
     // Keep a copy of generated sources
     doLast {
         println "Copying generated grammar lexer/parser files to main directory."
+        //@header {
+        //    package com.saveunhappy.saitama.antlr;在g4文件中规定了生成的目录
+        //}
+        //而且找Saitama.g4的语法文件，是默认找的src/main/antlr目录下，我们自定义的是子目录，所以可以找到
         copy {
             from "${buildDir}/generated-src/antlr/main"
             into "generated-src/main/java"

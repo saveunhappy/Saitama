@@ -5,7 +5,6 @@ import com.saveunhappy.saitama.antlr.SaitamaParser;
 import com.saveunhappy.saitama.compiler.domain.clazz.Function;
 import com.saveunhappy.saitama.compiler.domain.global.ClassDeclaration;
 import com.saveunhappy.saitama.compiler.domain.global.MetaData;
-import com.saveunhappy.saitama.compiler.domain.scope.FunctionSignature;
 import com.saveunhappy.saitama.compiler.domain.scope.Scope;
 
 import java.util.List;
@@ -25,10 +24,9 @@ public class ClassVisitor extends SaitamaBaseVisitor<ClassDeclaration> {
         scope = new Scope(metaData);
         //这里就是去获取所有的方法声明，并且添加到scope中去，返回值是没有用的，主要是
         //往scope中去添加方法签名
-        List<FunctionSignature> signatures = methodCtx.stream()
+        methodCtx.stream()
                 .map(method -> method.functionDeclaration().accept(functionSignatureVisitor))
-                .peek(scope::addSignature)
-                .collect(Collectors.toList());
+                .forEach(scope::addSignature);
 
         List<Function> methods = methodCtx.stream()
                 .map(method -> method.accept(new FunctionVisitor(scope)))
