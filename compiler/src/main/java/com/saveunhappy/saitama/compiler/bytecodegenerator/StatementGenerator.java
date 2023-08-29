@@ -64,31 +64,45 @@ public class StatementGenerator {
             methodVisitor.visitInsn(Opcodes.IRETURN);
         }
     }
+
     public void generate(IfStatement ifStatement) {
         Expression condition = ifStatement.getCondition();
         condition.accept(expressionGenerator);
-        //注意，在condition.accept(expressionGenerator);代码之后，
-        //栈上面的字节码是ICONST_0或者ICONST_1,
         Label trueLabel = new Label();
-        //TODO IFEQ是看是不是等于0，上面假设相等，那么现在栈顶就是ICONST_1，
-        //TODO 所以是false，那么就接着执行ifStatement.getTrueStatement().accept(this);
-        //TODO 因为字节码是GOTO那种类型的，所以如果你想按照正常的那种，if(true){}else{}
-        //TODO 你执行完IF之后是一定要跳转到一个位置的，你可以在这里反转，IFEQ改为IFNE
-        //TODO 但是我们是在操作符上做了改变，==对应的字节码就是不等于，这样相等就是放的就是
-        //TODO ICONST_1，然后IFEQ判断是不是0，如果是0跳转到trueLabel,这里是1，然后就不跳转
-        //TODO 执行了if下面的操作，重构那本书中也有，将条件表达式反转
-        methodVisitor.visitJumpInsn(Opcodes.IFEQ, trueLabel);
-        ifStatement.getTrueStatement().accept(this);
-        Label falseLabel = new Label();
-        methodVisitor.visitJumpInsn(Opcodes.GOTO, falseLabel);//如果是true,那么执行了ifStatement.getTrueStatement().accept(this);就该结束这个了，所以跳到false结束的地方
-        methodVisitor.visitLabel(trueLabel);
-        //表示栈帧没有发生改变，有可能你调用了一个方法之后消耗了栈帧，但是这里没有，告诉JVM，确实没有消耗栈帧
-        methodVisitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+        Label endLabel = new Label();
+        //现在栈顶是ICONST_1，那么是对的，IFNE，不等于0,跳到true。
+        methodVisitor.visitJumpInsn(Opcodes.IFNE, trueLabel);
         ifStatement.getFalseStatement().accept(this);
-        methodVisitor.visitLabel(falseLabel);
-        //表示栈帧没有发生改变，有可能你调用了一个方法之后消耗了栈帧，但是这里没有，告诉JVM，确实没有消耗栈帧
-        methodVisitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+        methodVisitor.visitJumpInsn(Opcodes.GOTO, endLabel);
+        methodVisitor.visitLabel(trueLabel);
+        ifStatement.getTrueStatement().accept(this);
+        methodVisitor.visitLabel(endLabel);
     }
+//    public void generate(IfStatement ifStatement) {
+//        Expression condition = ifStatement.getCondition();
+//        condition.accept(expressionGenerator);
+//        //注意，在condition.accept(expressionGenerator);代码之后，
+//        //栈上面的字节码是ICONST_0或者ICONST_1,
+//        Label trueLabel = new Label();
+//        //TODO IFEQ是看是不是等于0，上面假设相等，那么现在栈顶就是ICONST_1，
+//        //TODO 所以是false，那么就接着执行ifStatement.getTrueStatement().accept(this);
+//        //TODO 因为字节码是GOTO那种类型的，所以如果你想按照正常的那种，if(true){}else{}
+//        //TODO 你执行完IF之后是一定要跳转到一个位置的，你可以在这里反转，IFEQ改为IFNE
+//        //TODO 但是我们是在操作符上做了改变，==对应的字节码就是不等于，这样相等就是放的就是
+//        //TODO ICONST_1，然后IFEQ判断是不是0，如果是0跳转到trueLabel,这里是1，然后就不跳转
+//        //TODO 执行了if下面的操作，重构那本书中也有，将条件表达式反转
+//        methodVisitor.visitJumpInsn(Opcodes.IFEQ, trueLabel);
+//        ifStatement.getTrueStatement().accept(this);
+//        Label falseLabel = new Label();
+//        methodVisitor.visitJumpInsn(Opcodes.GOTO, falseLabel);//如果是true,那么执行了ifStatement.getTrueStatement().accept(this);就该结束这个了，所以跳到false结束的地方
+//        methodVisitor.visitLabel(trueLabel);
+//        //表示栈帧没有发生改变，有可能你调用了一个方法之后消耗了栈帧，但是这里没有，告诉JVM，确实没有消耗栈帧
+//        methodVisitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+//        ifStatement.getFalseStatement().accept(this);
+//        methodVisitor.visitLabel(falseLabel);
+//        //表示栈帧没有发生改变，有可能你调用了一个方法之后消耗了栈帧，但是这里没有，告诉JVM，确实没有消耗栈帧
+//        methodVisitor.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+//    }
 
     public void generate(Block block) {
         Scope newScope = block.getScope();

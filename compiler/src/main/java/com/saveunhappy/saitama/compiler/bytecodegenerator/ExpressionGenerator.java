@@ -133,13 +133,14 @@ public class ExpressionGenerator {
         rightExpression.accept(this);//这里也是去加载变量,actual
         CompareSign compareSign = conditionalExpression.getCompareSign();
         Label endLabel = new Label();
-        Label falseLabel = new Label();
         /*这里的比较运算符是相反的，比如==，但是opcode是IF_ICMPNE, 如果expected NOT_EQ actual,就跳转到false的Label */
-        methodVisitor.visitJumpInsn(compareSign.getOpcode(), falseLabel);
-        methodVisitor.visitInsn(Opcodes.ICONST_1);//推送常量1
-        methodVisitor.visitJumpInsn(Opcodes.GOTO, endLabel);
-        methodVisitor.visitLabel(falseLabel);
+        // == IF_ICMPEQ 8 == 5+3 所以是true，那么句推送常量1
+        Label trueLabel = new Label();
+        methodVisitor.visitJumpInsn(compareSign.getOpcode(), trueLabel);
         methodVisitor.visitInsn(Opcodes.ICONST_0);//推送常量0
+        methodVisitor.visitJumpInsn(Opcodes.GOTO, endLabel);
+        methodVisitor.visitLabel(trueLabel);
+        methodVisitor.visitInsn(Opcodes.ICONST_1);//推送常量1
         methodVisitor.visitLabel(endLabel);
     }
 
