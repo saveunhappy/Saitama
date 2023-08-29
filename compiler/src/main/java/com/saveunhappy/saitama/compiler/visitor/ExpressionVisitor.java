@@ -2,6 +2,7 @@ package com.saveunhappy.saitama.compiler.visitor;
 
 import com.saveunhappy.saitama.antlr.SaitamaBaseVisitor;
 import com.saveunhappy.saitama.antlr.SaitamaParser;
+import com.saveunhappy.saitama.compiler.CompareSign;
 import com.saveunhappy.saitama.compiler.domain.expression.*;
 import com.saveunhappy.saitama.compiler.domain.math.Addition;
 import com.saveunhappy.saitama.compiler.domain.math.Division;
@@ -10,6 +11,7 @@ import com.saveunhappy.saitama.compiler.domain.math.Substraction;
 import com.saveunhappy.saitama.compiler.domain.scope.FunctionSignature;
 import com.saveunhappy.saitama.compiler.domain.scope.LocalVariable;
 import com.saveunhappy.saitama.compiler.domain.scope.Scope;
+import com.saveunhappy.saitama.compiler.domain.type.BuiltInType;
 import com.saveunhappy.saitama.compiler.domain.type.Type;
 import com.saveunhappy.saitama.compiler.utils.TypeResolver;
 
@@ -99,6 +101,19 @@ public class ExpressionVisitor extends SaitamaBaseVisitor<Expression> {
         Expression rightExpression = rightExpressionContext.accept(this);
 
         return new Division(leftExpression, rightExpression);
+    }
+
+    @Override
+    public Expression visitConditionalExpression(SaitamaParser.ConditionalExpressionContext ctx) {
+        SaitamaParser.ExpressionContext leftExpressionContext = ctx.expression(0);
+        SaitamaParser.ExpressionContext rightExpressionContext = ctx.expression(1);
+
+        ExpressionVisitor expressionVisitor = new ExpressionVisitor(scope);
+        Expression leftExpression = leftExpressionContext.accept(expressionVisitor);
+        Expression rightExpression = rightExpressionContext != null ? rightExpressionContext.accept(expressionVisitor) : new Value(BuiltInType.INT, "0");
+
+        CompareSign cmpSign = ctx.cmp != null ? CompareSign.fromString(ctx.cmp.getText()) : CompareSign.NOT_EQUAL;
+        return new ConditionalExpression(leftExpression, rightExpression, cmpSign);
     }
 }
 

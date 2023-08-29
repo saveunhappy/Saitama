@@ -88,4 +88,13 @@ public class StatementVisitor extends SaitamaBaseVisitor<Statement> {
                 .collect(Collectors.toList());
         return new Block(scope, statements);
     }
+
+    @Override
+    public Statement visitIfStatement(SaitamaParser.IfStatementContext ctx) {
+        SaitamaParser.ExpressionContext conditionExpressionContext = ctx.expression();
+        Expression condition = conditionExpressionContext.accept(expressionVisitor);
+        Statement trueStatement = ctx.trueStatement.accept(this);
+        Statement falseStatement = ctx.falseStatement.accept(this);
+        return new IfStatement(condition, trueStatement, falseStatement);
+    }
 }

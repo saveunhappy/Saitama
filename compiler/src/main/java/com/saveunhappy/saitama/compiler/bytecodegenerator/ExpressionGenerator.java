@@ -1,5 +1,6 @@
 package com.saveunhappy.saitama.compiler.bytecodegenerator;
 
+import com.saveunhappy.saitama.compiler.CompareSign;
 import com.saveunhappy.saitama.compiler.domain.expression.*;
 import com.saveunhappy.saitama.compiler.domain.math.*;
 import com.saveunhappy.saitama.compiler.domain.scope.LocalVariable;
@@ -8,8 +9,10 @@ import com.saveunhappy.saitama.compiler.domain.type.BuiltInType;
 import com.saveunhappy.saitama.compiler.domain.type.ClassType;
 import com.saveunhappy.saitama.compiler.domain.type.Type;
 import com.saveunhappy.saitama.compiler.exception.CalledFunctionDoesNotExistException;
+import com.saveunhappy.saitama.compiler.exception.ComparisonBetweenDifferentTypesException;
 import com.saveunhappy.saitama.compiler.utils.DecriptorFactory;
 import org.apache.commons.lang3.StringUtils;
+import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
@@ -117,6 +120,29 @@ public class ExpressionGenerator {
         System.out.println("do nothing,asm deal");
         // do nothing
     }
+
+    public void generate(ConditionalExpression conditionalExpression) {
+        Expression leftExpression = conditionalExpression.getLeftExpression();
+        Expression rightExpression = conditionalExpression.getRightExpression();
+        Type type = leftExpression.getType();
+        if (type != rightExpression.getType()) {
+            throw new ComparisonBetweenDifferentTypesException(leftExpression, rightExpression);
+        }
+
+        leftExpression.accept(this);//这里就是去加载变量名了，比如expected
+        rightExpression.accept(this);//这里也是去加载变量,actual
+        CompareSign compareSign = conditionalExpression.getCompareSign();
+        Label endLabel = new Label();
+        Label falseLabel = new Label();
+        /*这里的比较运算符是相反的，比如==，但是opcode是IF_ICMPNE, 如果expected NOT_EQ actual,就跳转到false的Label */
+        methodVisitor.visitJumpInsn(compareSign.getOpcode(), falseLabel);
+        methodVisitor.visitInsn(Opcodes.ICONST_1);//推送常量1
+        methodVisitor.visitJumpInsn(Opcodes.GOTO, endLabel);
+        methodVisitor.visitLabel(falseLabel);
+        methodVisitor.visitInsn(Opcodes.ICONST_0);//推送常量0
+        methodVisitor.visitLabel(endLabel);
+    }
+
     private void evaluateArthimeticComponents(ArthimeticExpression expression) {
         Expression leftExpression = expression.getLeftExpression();
         Expression rightExpression = expression.getRightExpression();

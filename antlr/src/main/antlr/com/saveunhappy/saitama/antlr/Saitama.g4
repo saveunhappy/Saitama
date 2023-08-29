@@ -46,7 +46,9 @@ statement :     block
                | variableDeclaration
                | printStatement
                | functionCall
-               | returnStatement;
+               | returnStatement
+               | ifStatement;
+
 //var a = 1
 variableDeclaration : VARIABLE name EQUALS expression;
 //print a  print 1
@@ -56,6 +58,8 @@ returnStatement : 'return' #RETURNVOID
                 | ('return')? expression #RETURNWITHVALUE ;
 //函数调用
 functionCall : functionName '('expressionList ')';
+ifStatement: 'if'  ('(')? expression (')')? trueStatement=statement ('else' falseStatement=statement)?;
+
 name : ID ;
 //参数列表
 expressionList : expression? (',' expression)* ;
@@ -71,7 +75,14 @@ expression : variableReference #VarReference
            | expression '+' expression #ADD
            | '(' expression '-' expression ')' #SUBSTRACT
            | expression '-' expression #SUBSTRACT
+           | expression cmp='>' expression #conditionalExpression
+           | expression cmp='<' expression #conditionalExpression
+           | expression cmp='==' expression #conditionalExpression
+           | expression cmp='!=' expression #conditionalExpression
+           | expression cmp='>=' expression #conditionalExpression
+           | expression cmp='<=' expression #conditionalExpression
            ;
+
 variableReference : ID ;
 value : NUMBER
       | STRING ;
