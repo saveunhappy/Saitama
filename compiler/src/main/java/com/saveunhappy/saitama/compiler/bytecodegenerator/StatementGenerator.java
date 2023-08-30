@@ -108,7 +108,7 @@ public class StatementGenerator {
         Scope newScope = block.getScope();
         List<Statement> statements = block.getStatements();
         StatementGenerator statementGenerator = new StatementGenerator(methodVisitor, newScope);
-        statements.stream()
+        statements
                 .forEach(stmt -> stmt.accept(statementGenerator));
     }
 }

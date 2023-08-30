@@ -17,17 +17,16 @@ public class ClassVisitor extends SaitamaBaseVisitor<ClassDeclaration> {
     @Override
     public ClassDeclaration visitClassDeclaration(SaitamaParser.ClassDeclarationContext ctx) {
         String name = ctx.className().getText();
-        FunctionSignatureVisitor functionSignatureVisitor = new FunctionSignatureVisitor();
+        FunctionSignatureVisitor functionSignatureVisitor = new FunctionSignatureVisitor(scope);
         List<SaitamaParser.FunctionContext> methodCtx = ctx.classBody().function();
-        //目前是只有自己的类名,之后加上构造器相关解析，可能就会加上父类相关的
         MetaData metaData = new MetaData(ctx.className().getText());
+        //目前是只有自己的类名,之后加上构造器相关解析，可能就会加上父类相关的
         scope = new Scope(metaData);
         //这里就是去获取所有的方法声明，并且添加到scope中去，返回值是没有用的，主要是
         //往scope中去添加方法签名
         methodCtx.stream()
                 .map(method -> method.functionDeclaration().accept(functionSignatureVisitor))
                 .forEach(scope::addSignature);
-
         List<Function> methods = methodCtx.stream()
                 .map(method -> method.accept(new FunctionVisitor(scope)))
                 .collect(Collectors.toList());

@@ -17,11 +17,11 @@ classBody :  function* ;
 function : functionDeclaration block;
 //functionDeclaration : (type)? functionName '('(functionArgument)*')' ;
 //返回值类型（可选） 方法名，参数列表，可以是多个
-functionDeclaration : (type)? functionName '(' (functionArgument (',' functionArgument)*)?')' ;
+functionDeclaration : (type)? functionName '(' (functionParameter (',' functionParameter)*)?')' ;
 //方法名
 functionName : ID ;
 //方法参数，String a;可以有默认值，比如String a = "a"
-functionArgument : type ID functionParamdefaultValue? ;
+functionParameter : type ID functionParamdefaultValue? ;
 //a = a
 functionParamdefaultValue : '=' expression ;
 //原生类型和引用类型

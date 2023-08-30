@@ -19,7 +19,7 @@ public class Compiler implements Opcodes {
 
     public static void main(String[] args) {
         //String[] sourceCodeLocation = {"SaitamaExample/First.stm","SaitamaExample/Second.stm","SaitamaExample/Third.stm","SaitamaExample/Forth.stm"};
-        String[] sourceCodeLocation = {"SaitamaExample/SumCalculator.stm"};
+        String[] sourceCodeLocation = {"SaitamaExample/DefaultParamTest.stm"};
         try {
             new Compiler().compile(sourceCodeLocation);
         } catch (Exception e) {

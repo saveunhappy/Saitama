@@ -42,12 +42,10 @@ public class ExpressionVisitor extends SaitamaBaseVisitor<Expression> {
         return new Value(type, value);
     }
 
-
     @Override
     public Expression visitFunctionCall(SaitamaParser.FunctionCallContext ctx) {
         String funName = ctx.functionName().getText();
-        FunctionSignature signature = scope.getSignature(funName);//在最开始的时候就有了所有的方法签名，如果这个时候获取不到，那么就说明有错
-        List<FunctionParameter> signatureParameters = signature.getArguments();
+        FunctionSignature signature = scope.getSignature(funName);
         List<SaitamaParser.ExpressionContext> calledParameters = ctx.expressionList().expression();
         /**
          * 因为方法调用的话，你是需要传参数的啊，那么就获取到你的变量名，如果没有获取到
@@ -56,7 +54,6 @@ public class ExpressionVisitor extends SaitamaBaseVisitor<Expression> {
         List<Expression> arguments = calledParameters.stream()
                 .map((expressionContext -> expressionContext.accept(this)))
                 .collect(Collectors.toList());
-        Type returnType = signature.getReturnType();
         return new FunctionCall(signature, arguments, null);
 
     }

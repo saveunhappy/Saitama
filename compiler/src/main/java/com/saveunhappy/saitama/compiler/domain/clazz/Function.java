@@ -1,33 +1,27 @@
 package com.saveunhappy.saitama.compiler.domain.clazz;
 
 import com.saveunhappy.saitama.compiler.domain.expression.FunctionParameter;
-import com.saveunhappy.saitama.compiler.domain.scope.Scope;
+import com.saveunhappy.saitama.compiler.domain.scope.FunctionSignature;
 import com.saveunhappy.saitama.compiler.domain.statement.Statement;
 import com.saveunhappy.saitama.compiler.domain.type.Type;
-
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 public class Function {
-    private String name;
-    private List<FunctionParameter> arguments;
+    private FunctionSignature functionSignature;
     private Statement rootStatement;
-    private Type returnType;
 
-    public Function(String name, Type returnType, List<FunctionParameter> arguments, Statement rootStatement) {
-        this.name = name;
-        this.arguments = arguments;
+    public Function(FunctionSignature functionSignature, Statement rootStatement) {
+        this.functionSignature = functionSignature;
         this.rootStatement = rootStatement;
-        this.returnType = returnType;
     }
 
     public String getName() {
-        return name;
+        return functionSignature.getName();
     }
 
-    public List<FunctionParameter> getArguments() {
-        return Collections.unmodifiableList(arguments);
+    public List<FunctionParameter> getParameter() {
+        return Collections.unmodifiableList(functionSignature.getParameters());
     }
 
     public Statement getRootStatement() {
@@ -35,6 +29,6 @@ public class Function {
     }
 
     public Type getReturnType() {
-        return returnType;
+        return functionSignature.getReturnType();
     }
 }
