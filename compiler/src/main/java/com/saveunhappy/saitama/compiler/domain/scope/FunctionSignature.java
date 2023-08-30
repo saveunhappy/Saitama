@@ -2,6 +2,7 @@ package com.saveunhappy.saitama.compiler.domain.scope;
 
 import com.saveunhappy.saitama.compiler.domain.expression.FunctionParameter;
 import com.saveunhappy.saitama.compiler.domain.type.Type;
+import com.saveunhappy.saitama.compiler.exception.ParameterForNameNotFoundException;
 
 import java.util.List;
 
@@ -26,5 +27,17 @@ public class FunctionSignature {
 
     public Type getReturnType() {
         return returnType;
+    }
+
+    public FunctionParameter getParameterForName(String name) {
+        return parameters.stream()
+                .filter(param -> param.getName().equals(name))
+                .findFirst()
+                .orElseThrow(() -> new ParameterForNameNotFoundException(name, parameters));
+    }
+
+    public int getIndexOfParameters(String parameterName) {
+        FunctionParameter parameter = getParameterForName(parameterName);
+        return parameters.indexOf(parameter);
     }
 }

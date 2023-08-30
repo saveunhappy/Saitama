@@ -57,7 +57,10 @@ printStatement : PRINT expression ;
 returnStatement : 'return' #RETURNVOID
                 | ('return')? expression #RETURNWITHVALUE ;
 //函数调用
-functionCall : functionName '('expressionList ')';
+functionCall : functionName '('argument? (',' argument)* ')';
+
+argument : expression
+         | name '->' expression ;
 ifStatement: 'if'  ('(')? expression (')')? trueStatement=statement ('else' falseStatement=statement)?;
 
 name : ID ;
@@ -90,7 +93,7 @@ value : NUMBER
 VARIABLE : 'var' ;
 PRINT : 'print' ;
 EQUALS : '=' ;
-NUMBER : [0-9]+ ;
+NUMBER : '-'?[0-9]+ ;
 STRING : '"'~('\r' | '\n' | '"')*'"' ;
 ID : [a-zA-Z0-9]+ ;
 QUALIFIED_NAME : ID ('.' ID)+;

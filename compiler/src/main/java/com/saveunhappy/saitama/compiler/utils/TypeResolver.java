@@ -5,6 +5,7 @@ import com.saveunhappy.saitama.compiler.domain.type.BuiltInType;
 import com.saveunhappy.saitama.compiler.domain.type.ClassType;
 import com.saveunhappy.saitama.compiler.domain.type.Type;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -28,9 +29,13 @@ public class TypeResolver {
 
     public static Type getFromValue(String value) {
         if (StringUtils.isEmpty(value)) return BuiltInType.VOID;
-        if (StringUtils.isNumeric(value)) {
+        if (NumberUtils.isNumber(value)) {
             return BuiltInType.INT;
         }
+        //因为有负数的情况，所以不能用这个工具类了。
+//        if(StringUtils.isNumeric(value)){
+//            return BuiltInType.INT;
+//        }
         return BuiltInType.STRING;
     }
 
