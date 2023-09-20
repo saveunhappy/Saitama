@@ -97,4 +97,10 @@ public class StatementVisitor extends SaitamaBaseVisitor<Statement> {
         Statement falseStatement = ctx.falseStatement.accept(this);
         return new IfStatement(condition, trueStatement, falseStatement);
     }
+
+    @Override
+    public Statement visitForStatement(SaitamaParser.ForStatementContext ctx) {
+        ForStatementVisitor forStatementVisitor = new ForStatementVisitor(scope);
+        return ctx.accept(forStatementVisitor);
+    }
 }

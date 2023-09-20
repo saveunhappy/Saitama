@@ -1,7 +1,10 @@
 package com.saveunhappy.saitama.compiler.bytecodegenerator;
 
+import com.saveunhappy.saitama.compiler.CompareSign;
+import com.saveunhappy.saitama.compiler.domain.expression.ConditionalExpression;
 import com.saveunhappy.saitama.compiler.domain.expression.Expression;
 import com.saveunhappy.saitama.compiler.domain.expression.FunctionCall;
+import com.saveunhappy.saitama.compiler.domain.expression.VarReference;
 import com.saveunhappy.saitama.compiler.domain.scope.Scope;
 import com.saveunhappy.saitama.compiler.domain.statement.*;
 import com.saveunhappy.saitama.compiler.domain.type.BuiltInType;
@@ -37,18 +40,26 @@ public class StatementGenerator {
 
     public void generate(VariableDeclarationStatement variableDeclarationStatement) {
         Expression expression = variableDeclarationStatement.getExpression();
-        String name = variableDeclarationStatement.getName();
-        //因为之前已经把参数和本地变量都放到了一个存储本地变量的List中，所以这里要获取索引，
-        int index = scope.getLocalVariableIndex(name);
-        Type type = expression.getType();
-        // 然后立马进行保存,VariableDeclarationStatement变量声明，当然要进行保存了，
-        expression.accept(expressionGenerator);
-        if (type == BuiltInType.INT) {
-            methodVisitor.visitVarInsn(Opcodes.ISTORE, index);
-        } else {
-            methodVisitor.visitVarInsn(Opcodes.ASTORE, index);
-        }
+        //String name = variableDeclarationStatement.getName();
+        //Type type = expression.getType();
+        expression.accept(expressionGenerator);//解析表达式，把1写入栈
+        AssignmentStatement assignmentStatement = new AssignmentStatement(variableDeclarationStatement);
+        generate(assignmentStatement);//保存变量，把1保存到一个变量中去
     }
+//    public void generate(VariableDeclarationStatement variableDeclarationStatement) {
+//        Expression expression = variableDeclarationStatement.getExpression();
+//        String name = variableDeclarationStatement.getName();
+//        //因为之前已经把参数和本地变量都放到了一个存储本地变量的List中，所以这里要获取索引，
+//        int index = scope.getLocalVariableIndex(name);
+//        Type type = expression.getType();
+//        // 然后立马进行保存,VariableDeclarationStatement变量声明，当然要进行保存了，
+//        expression.accept(expressionGenerator);
+//        if (type == BuiltInType.INT) {
+//            methodVisitor.visitVarInsn(Opcodes.ISTORE, index);
+//        } else {
+//            methodVisitor.visitVarInsn(Opcodes.ASTORE, index);
+//        }
+//    }
 
     public void generate(FunctionCall functionCall) {
         functionCall.accept(expressionGenerator);
@@ -110,5 +121,68 @@ public class StatementGenerator {
         StatementGenerator statementGenerator = new StatementGenerator(methodVisitor, newScope);
         statements
                 .forEach(stmt -> stmt.accept(statementGenerator));
+    }
+
+    public void generate(RangedForStatement rangedForStatement) {
+        Scope newScope = rangedForStatement.getScope();//获取自己scope的变量
+        StatementGenerator scopeGeneratorWithNewScope = new StatementGenerator(methodVisitor, newScope);
+        ExpressionGenerator exprGeneratorWithNewScope = new ExpressionGenerator(methodVisitor, newScope);
+        Statement iterator = rangedForStatement.getIteratorVariableStatement();//获取变量的表达式，有变量名和初始值
+        Label incrementationSection = new Label();
+        Label decrementationSection = new Label();
+        Label endLoopSection = new Label();
+        String iteratorVarName = rangedForStatement.getIteratorVarName();//获取变量名
+        Expression endExpression = rangedForStatement.getEndExpression();
+        Expression iteratorVariable = new VarReference(iteratorVarName, rangedForStatement.getType());
+        ConditionalExpression iteratorGreaterThanEndConditional = new ConditionalExpression(iteratorVariable, endExpression, CompareSign.GREATER);
+        ConditionalExpression iteratorLessThanEndConditional = new ConditionalExpression(iteratorVariable, endExpression, CompareSign.LESS);
+        /**上面为啥要创建两个，因为实现的功能是1 to 10就是递增，10 to 1就是递减，
+             就比较谁大谁小决定递增还是递减*/
+        iterator.accept(scopeGeneratorWithNewScope);//变量声明，就是x，循环变量
+        // 大于的话，跳转到一个位置，传进去的这个对象是只有scope和classWriter，
+        // 就是要进行写入字节码的，他本身就是一个Expression，所以可以把ExpressionVisitor传进去，
+        // 进行生成字节码，然后iteratorLessThanEndConditional对象是有开始和结束的数字的，
+        // 还有比大还是比小，又是一个新的Expression或者是Statement
+        iteratorLessThanEndConditional.accept(exprGeneratorWithNewScope);
+        methodVisitor.visitJumpInsn(Opcodes.IFNE,incrementationSection);
+        // 大于的话，跳转到一个位置，传进去的这个对象是只有scope和classWriter，
+        // 就是要进行写入字节码的，他本身就是一个Expression，所以可以把ExpressionVisitor传进去，
+        // 进行生成字节码，然后iteratorLessThanEndConditional对象是有开始和结束的数字的，
+        // 还有比大还是比小，又是一个新的Expression或者是Statement
+        iteratorGreaterThanEndConditional.accept(exprGeneratorWithNewScope);
+        methodVisitor.visitJumpInsn(Opcodes.IFNE,decrementationSection);
+        /** 就当成在写汇编，incrementationSection就跳到这，decrementationSection就跳到后面，*/
+        methodVisitor.visitLabel(incrementationSection);
+        rangedForStatement.getStatement().accept(scopeGeneratorWithNewScope);
+        /** 执行完之后，变量的值就加1*/
+        methodVisitor.visitIincInsn(newScope.getLocalVariableIndex(iteratorVarName),1);
+        //继续去进行比较
+        iteratorGreaterThanEndConditional.accept(exprGeneratorWithNewScope);
+        /** 这里如果不等于0，就又跳到上面去了*/
+        methodVisitor.visitJumpInsn(Opcodes.IFEQ,incrementationSection);
+        methodVisitor.visitJumpInsn(Opcodes.GOTO,endLoopSection);
+
+        methodVisitor.visitLabel(decrementationSection);
+        rangedForStatement.getStatement().accept(scopeGeneratorWithNewScope);
+        /** 这里就减1,没有减法，就加上-1,就是减一的操作*/
+        methodVisitor.visitIincInsn(newScope.getLocalVariableIndex(iteratorVarName),-1);
+        //继续去进行比较
+        iteratorLessThanEndConditional.accept(exprGeneratorWithNewScope);
+        /** 这里如果不等于0，就又跳到上面去了*/
+        methodVisitor.visitJumpInsn(Opcodes.IFEQ,decrementationSection);
+
+        methodVisitor.visitLabel(endLoopSection);
+    }
+
+
+    public void generate(AssignmentStatement assignmentStatement) {
+        String varName = assignmentStatement.getVarName();
+        Type type = assignmentStatement.getExpression().getType();
+        int index = scope.getLocalVariableIndex(varName);
+        if (type == BuiltInType.INT || type == BuiltInType.BOOLEAN) {
+            methodVisitor.visitVarInsn(Opcodes.ISTORE, index);
+        } else {
+            methodVisitor.visitVarInsn(Opcodes.ASTORE, index);
+        }
     }
 }

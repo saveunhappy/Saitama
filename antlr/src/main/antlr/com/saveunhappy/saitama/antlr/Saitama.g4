@@ -47,6 +47,7 @@ statement :     block
                | printStatement
                | functionCall
                | returnStatement
+               | forStatement
                | ifStatement;
 
 //var a = 1
@@ -62,6 +63,9 @@ functionCall : functionName '('argument? (',' argument)* ')';
 argument : expression
          | name '->' expression ;
 ifStatement: 'if'  ('(')? expression (')')? trueStatement=statement ('else' falseStatement=statement)?;
+
+forStatement : 'for' ('(')? forConditions (')')? statement ;
+forConditions : iterator=variableReference  'from' startExpr=expression range='to' endExpr=expression ;
 
 name : ID ;
 //参数列表

@@ -29,7 +29,7 @@ public class ExpressionGenerator {
     //现在是statement包含expression生成的东西和method生成相关的东西，相当于就是模板模式
     //原来的compositeVisitor没有了，原来是StatementVisitor和ExpressionVisitor
     //现在Expression继承自Statement，所以就去掉那个东西了。
-    /***
+    /**
      *
      *         StatementVisitor statementVisitor = new StatementVisitor(scope);
      *         ExpressionVisitor expressionVisitor = new ExpressionVisitor(scope);
@@ -162,7 +162,7 @@ public class ExpressionGenerator {
         String leftExprDescriptor = leftExpression.getType().getDescriptor();
         String descriptor = "("+leftExprDescriptor+ ")Ljava/lang/StringBuilder;";
         methodVisitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append", descriptor, false);
-        
+
         Expression rightExpression = expression.getRightExpression();
         rightExpression.accept(this);
         String rightExprDescriptor = rightExpression.getType().getDescriptor();
@@ -205,7 +205,7 @@ public class ExpressionGenerator {
         Label endLabel = new Label();
         /*这里的比较运算符是相反的，比如==，但是opcode是IF_ICMPNE, 如果expected NOT_EQ actual,就跳转到false的Label */
         // == IF_ICMPEQ 8 == 5+3 所以是true，那么句推送常量1
-        Label trueLabel = new Label();
+        Label trueLabel = new Label();//注意上面的两个accept(this)，变量已经放到栈上了，这里就是直接去比较了
         methodVisitor.visitJumpInsn(compareSign.getOpcode(), trueLabel);
         methodVisitor.visitInsn(Opcodes.ICONST_0);//推送常量0
         methodVisitor.visitJumpInsn(Opcodes.GOTO, endLabel);

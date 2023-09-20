@@ -53,7 +53,10 @@ public class Scope {
         LocalVariable localVariable = getLocalVariable(varName);
         return localVariables.indexOf(localVariable);
     }
-
+    public boolean localVariableExists(String varName) {
+        return localVariables.stream()
+                .anyMatch(variable -> variable.getName().equals(varName));
+    }
     public String getClassName() {
         return metaData.getClassName();
     }
