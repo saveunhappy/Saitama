@@ -3,6 +3,7 @@ package com.saveunhappy.saitama.compiler.visitor;
 import com.saveunhappy.saitama.antlr.SaitamaBaseVisitor;
 import com.saveunhappy.saitama.antlr.SaitamaParser;
 import com.saveunhappy.saitama.compiler.domain.expression.Expression;
+import com.saveunhappy.saitama.compiler.domain.expression.VarReference;
 import com.saveunhappy.saitama.compiler.domain.scope.LocalVariable;
 import com.saveunhappy.saitama.compiler.domain.scope.Scope;
 import com.saveunhappy.saitama.compiler.domain.statement.AssignmentStatement;
@@ -29,7 +30,9 @@ public class ForStatementVisitor extends SaitamaBaseVisitor<RangedForStatement> 
         SaitamaParser.VariableReferenceContext iterator = forConditionsContext.iterator;
         String varName = iterator.getText();
         if (scope.localVariableExists(varName)) {
-            Statement iteratorVariable = new AssignmentStatement(varName, startExpression);
+            LocalVariable localVariable = scope.getLocalVariable(varName);
+            Statement iteratorVariable =  new VarReference(varName, localVariable.getType());
+//            Statement iteratorVariable = new AssignmentStatement(varName, startExpression);
             Statement statement = ctx.statement().accept(statementVisitor);
             return new RangedForStatement(iteratorVariable, startExpression, endExpression, statement, varName, scope);
         } else {

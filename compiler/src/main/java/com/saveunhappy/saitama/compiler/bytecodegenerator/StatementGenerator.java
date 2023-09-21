@@ -5,6 +5,7 @@ import com.saveunhappy.saitama.compiler.domain.expression.ConditionalExpression;
 import com.saveunhappy.saitama.compiler.domain.expression.Expression;
 import com.saveunhappy.saitama.compiler.domain.expression.FunctionCall;
 import com.saveunhappy.saitama.compiler.domain.expression.VarReference;
+import com.saveunhappy.saitama.compiler.domain.scope.LocalVariable;
 import com.saveunhappy.saitama.compiler.domain.scope.Scope;
 import com.saveunhappy.saitama.compiler.domain.statement.*;
 import com.saveunhappy.saitama.compiler.domain.type.BuiltInType;
@@ -183,6 +184,18 @@ public class StatementGenerator {
             methodVisitor.visitVarInsn(Opcodes.ISTORE, index);
         } else {
             methodVisitor.visitVarInsn(Opcodes.ASTORE, index);
+        }
+    }
+
+    public void generate(VarReference varReference) {
+        String varName = varReference.getVarName();
+        int index = scope.getLocalVariableIndex(varName);
+        LocalVariable localVariable = scope.getLocalVariable(varName);
+        Type type = localVariable.getType();
+        if (type == BuiltInType.INT) {
+            methodVisitor.visitVarInsn(Opcodes.ILOAD, index);
+        } else {
+            methodVisitor.visitVarInsn(Opcodes.ALOAD, index);
         }
     }
 }
