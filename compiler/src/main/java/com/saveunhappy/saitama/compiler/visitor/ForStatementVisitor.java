@@ -29,7 +29,7 @@ public class ForStatementVisitor extends SaitamaBaseVisitor<RangedForStatement> 
         SaitamaParser.VariableReferenceContext iterator = forConditionsContext.iterator;
         String varName = iterator.getText();
         if (scope.localVariableExists(varName)) {
-            Statement iteratorVariable = new AssignmentStatement(varName, startExpression);
+            Statement iteratorVariable = new AssignmentStatement(varName, startExpression,scope.localVariableExists(varName));
             Statement statement = ctx.statement().accept(statementVisitor);
             return new RangedForStatement(iteratorVariable, startExpression, endExpression, statement, varName, scope);
         } else {

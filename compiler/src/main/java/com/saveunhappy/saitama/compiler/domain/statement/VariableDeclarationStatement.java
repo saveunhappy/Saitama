@@ -6,10 +6,19 @@ import com.saveunhappy.saitama.compiler.domain.expression.Expression;
 public class VariableDeclarationStatement implements Statement {
     private String name;
     private Expression expression;
+    private boolean isDeclared;
 
-    public VariableDeclarationStatement(String name, Expression expression) {
+
+    public VariableDeclarationStatement(String name, Expression expression, boolean isDeclared) {
         this.name = name;
         this.expression = expression;
+        this.isDeclared = isDeclared;
+    }
+
+    public VariableDeclarationStatement(String name, Expression expression) {
+//        this.name = name;
+//        this.expression = expression;
+        this(name,expression,false);
     }
 
     public String getName() {
@@ -19,6 +28,11 @@ public class VariableDeclarationStatement implements Statement {
     public Expression getExpression() {
         return expression;
     }
+
+    public boolean isDeclared() {
+        return isDeclared;
+    }
+
 
     @Override
     public void accept(StatementGenerator generator) {
