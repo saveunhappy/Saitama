@@ -179,6 +179,7 @@ public class StatementGenerator {
         String varName = assignmentStatement.getVarName();
         Type type = assignmentStatement.getExpression().getType();
         int index = scope.getLocalVariableIndex(varName);
+
         if (type == BuiltInType.INT || type == BuiltInType.BOOLEAN) {
             methodVisitor.visitVarInsn(Opcodes.ISTORE, index);
         } else {
