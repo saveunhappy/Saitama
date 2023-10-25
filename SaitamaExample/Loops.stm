@@ -5,6 +5,7 @@ Loops {
         for x from 1 to 10 {
             print x
         }
+        print "-------"
         print x
     }
 }

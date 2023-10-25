@@ -57,6 +57,7 @@ public class StatementVisitor extends SaitamaBaseVisitor<Statement> {
         //所以accept就是this，递归的去调用,看上面的代码
         Expression expression = expressionCtx.accept(expressionVisitor);
         //表达式最终还是要变成一个值的，所以也变成一个变量添加到作用域中去
+        //添加一个本地变量，变量名和变量的类型，如果类型不匹配那么在进行运算的时候就会报错
         scope.addLocalVariable(new LocalVariable(varName, expression.getType()));
         return new VariableDeclarationStatement(varName, expression);
     }
