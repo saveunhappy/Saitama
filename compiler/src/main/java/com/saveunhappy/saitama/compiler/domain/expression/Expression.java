@@ -13,6 +13,5 @@ public abstract class Expression {
     public Type getType() {
         return type;
     }
-
     public abstract void accept(ExpressionGenerator generator);
 }

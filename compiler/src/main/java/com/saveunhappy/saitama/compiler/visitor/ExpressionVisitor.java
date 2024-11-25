@@ -68,47 +68,31 @@ public class ExpressionVisitor extends SaitamaBaseVisitor<Expression> {
         return new FunctionCall(signature, arguments, null);
     }
 
-
     @Override
-    public Expression visitADD(SaitamaParser.ADDContext ctx) {
+    public Expression visitAddSub(SaitamaParser.AddSubContext ctx) {
         SaitamaParser.ExpressionContext leftExpressionContext = ctx.expression(0);
         SaitamaParser.ExpressionContext rightExpressionContext = ctx.expression(1);
         Expression leftExpression = leftExpressionContext.accept(this);
         Expression rightExpression = rightExpressionContext.accept(this);
-
-        return new Addition(leftExpression, rightExpression);
-    }
-
-
-    @Override
-    public Expression visitMULTIPLY(SaitamaParser.MULTIPLYContext ctx) {
-        SaitamaParser.ExpressionContext leftExpressionContext = ctx.expression(0);
-        SaitamaParser.ExpressionContext rightExpressionContext = ctx.expression(1);
-        Expression leftExpression = leftExpressionContext.accept(this);
-        Expression rightExpression = rightExpressionContext.accept(this);
-
-        return new Multiplication(leftExpression, rightExpression);
-    }
-
-
-    @Override
-    public Expression visitSUBSTRACT(SaitamaParser.SUBSTRACTContext ctx) {
-        SaitamaParser.ExpressionContext leftExpressionContext = ctx.expression(0);
-        SaitamaParser.ExpressionContext rightExpressionContext = ctx.expression(1);
-        Expression leftExpression = leftExpressionContext.accept(this);
-        Expression rightExpression = rightExpressionContext.accept(this);
-
-        return new Substraction(leftExpression, rightExpression);
+        if (ctx.op.getText().equals("+")) {
+            return new Addition(leftExpression, rightExpression);
+        } else {
+            return new Substraction(leftExpression, rightExpression);
+        }
     }
 
     @Override
-    public Expression visitDIVIDE(SaitamaParser.DIVIDEContext ctx) {
+    public Expression visitMulDiv(SaitamaParser.MulDivContext ctx) {
         SaitamaParser.ExpressionContext leftExpressionContext = ctx.expression(0);
         SaitamaParser.ExpressionContext rightExpressionContext = ctx.expression(1);
         Expression leftExpression = leftExpressionContext.accept(this);
         Expression rightExpression = rightExpressionContext.accept(this);
+        if (ctx.op.getText().equals("*")) {
+            return new Multiplication(leftExpression, rightExpression);
+        } else {
+            return new Division(leftExpression, rightExpression);
+        }
 
-        return new Division(leftExpression, rightExpression);
     }
 
     @Override

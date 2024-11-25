@@ -9,6 +9,8 @@ import org.objectweb.asm.Opcodes;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -19,7 +21,7 @@ public class Compiler implements Opcodes {
 
     public static void main(String[] args) {
         //String[] sourceCodeLocation = {"SaitamaExample/First.stm","SaitamaExample/Second.stm","SaitamaExample/Third.stm","SaitamaExample/Forth.stm"};
-        String[] sourceCodeLocation = {"SaitamaExample/Loops.stm"};
+        String[] sourceCodeLocation = {"SaitamaExample/SumCalculator2.stm"};
         try {
             new Compiler().compile(sourceCodeLocation);
         } catch (Exception e) {
@@ -34,6 +36,7 @@ public class Compiler implements Opcodes {
             System.out.println(argumentsErrors.getMessage());
             return;
         }
+
         final File enkelFile = new File(args[0]);
         String fileAbsolutePath = enkelFile.getAbsolutePath();
         final CompilationUnit compilationUnit = new Parser().getCompilationUnit(fileAbsolutePath);
@@ -51,12 +54,23 @@ public class Compiler implements Opcodes {
         return ARGUMENT_ERRORS.NONE;
     }
 
-    private static void saveBytecodeToClassFile(CompilationUnit compilationUnit) throws IOException {
+    private static void saveBytecodeToClassFile(CompilationUnit compilationUnit) throws IOException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         BytecodeGenerator bytecodeGenerator = new BytecodeGenerator();
         final byte[] byteCode = bytecodeGenerator.generate(compilationUnit);
+
         String className = compilationUnit.getClassName();
         String fileName = className + ".class";
         OutputStream os = Files.newOutputStream(Paths.get(fileName));
         IOUtils.write(byteCode, os);
+        ClassLoader classLoader = new ClassLoader() {
+            @Override
+            protected Class<?> findClass(String name) {
+                return defineClass(name, byteCode, 0, byteCode.length);
+            }
+        };
+        Class<?> dynamicClass = classLoader.loadClass(className);
+        Method mainMethod = dynamicClass.getMethod("main", String[].class);
+        String[] params = null; // 可传入参数
+        mainMethod.invoke(null, (Object) params); // 调用 main 方法
     }
 }

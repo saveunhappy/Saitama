@@ -1,0 +1,9 @@
+SumCalculator2 {
+
+    main(string[] args) {
+       var a = 5 * 3 / 2 + 1 - 2
+       print a
+    }
+
+
+}

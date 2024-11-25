@@ -4,6 +4,7 @@ import com.saveunhappy.saitama.antlr.SaitamaBaseVisitor;
 import com.saveunhappy.saitama.antlr.SaitamaParser;
 import com.saveunhappy.saitama.compiler.domain.global.ClassDeclaration;
 import com.saveunhappy.saitama.compiler.domain.global.CompilationUnit;
+import org.antlr.runtime.tree.ParseTree;
 
 public class CompilationUnitVisitor extends SaitamaBaseVisitor<CompilationUnit> {
 

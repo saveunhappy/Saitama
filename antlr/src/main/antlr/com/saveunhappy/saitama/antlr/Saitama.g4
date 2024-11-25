@@ -22,7 +22,7 @@ functionDeclaration : (type)? functionName '(' (functionParameter (',' functionP
 functionName : ID ;
 //方法参数，String a;可以有默认值，比如String a = "a"
 functionParameter : type ID functionParamdefaultValue? ;
-//a = a
+//a = "String"
 functionParamdefaultValue : '=' expression ;
 //原生类型和引用类型
 type : primitiveType
@@ -74,14 +74,12 @@ expressionList : expression? (',' expression)* ;
 expression : variableReference #VarReference
            | value        #ValueExpr
            | functionCall #FUNCALL
-           | '(' expression '/' expression ')' #DIVIDE
-           | expression '/' expression #DIVIDE
-           |  '('expression '*' expression')' #MULTIPLY
-           | expression '*' expression  #MULTIPLY
-           | '(' expression '+' expression ')' #ADD
-           | expression '+' expression #ADD
-           | '(' expression '-' expression ')' #SUBSTRACT
-           | expression '-' expression #SUBSTRACT
+           | '(' expression op=('*'|'/') expression ')'#MulDiv
+           | '(' expression op=('+'|'-') expression ')'#AddSub
+           | expression op=('*'|'/') expression #MulDiv
+           | expression op=('+'|'-') expression #AddSub
+
+//           | '(' expression ')'                 #ParenExpr
            | expression cmp='>' expression #conditionalExpression
            | expression cmp='<' expression #conditionalExpression
            | expression cmp='==' expression #conditionalExpression
