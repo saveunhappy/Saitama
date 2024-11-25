@@ -74,8 +74,7 @@ expressionList : expression? (',' expression)* ;
 expression : variableReference #VarReference
            | value        #ValueExpr
            | functionCall #FUNCALL
-           | '(' expression op=('*'|'/') expression ')'#MulDiv
-           | '(' expression op=('+'|'-') expression ')'#AddSub
+           | '(' expression ')' #ExpressionNew
            | expression op=('*'|'/') expression #MulDiv
            | expression op=('+'|'-') expression #AddSub
 
@@ -87,7 +86,6 @@ expression : variableReference #VarReference
            | expression cmp='>=' expression #conditionalExpression
            | expression cmp='<=' expression #conditionalExpression
            ;
-
 variableReference : ID ;
 value : NUMBER
       | STRING ;

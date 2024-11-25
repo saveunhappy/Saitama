@@ -81,6 +81,9 @@ public class ExpressionVisitor extends SaitamaBaseVisitor<Expression> {
         }
     }
 
+
+
+
     @Override
     public Expression visitMulDiv(SaitamaParser.MulDivContext ctx) {
         SaitamaParser.ExpressionContext leftExpressionContext = ctx.expression(0);
@@ -105,6 +108,17 @@ public class ExpressionVisitor extends SaitamaBaseVisitor<Expression> {
 
         CompareSign cmpSign = ctx.cmp != null ? CompareSign.fromString(ctx.cmp.getText()) : CompareSign.NOT_EQUAL;
         return new ConditionalExpression(leftExpression, rightExpression, cmpSign);
+    }
+
+//    @Override
+//    public Expression visitParenExpr(SaitamaParser.ParenExprContext ctx) {
+//        // 递归解析括号中的表达式
+//        return ctx.expression().accept(this);
+//    }
+
+    @Override
+    public Expression visitExpressionNew(SaitamaParser.ExpressionNewContext ctx) {
+        return ctx.expression().accept(this);
     }
 }
 
