@@ -24,7 +24,9 @@ dependencies {
 
 generateGrammarSource {
     maxHeapSize = "64m"
-    arguments += ["-visitor", "-long-messages"]
+//    arguments += ["-visitor", "-long-messages","-package", "src/main/antlr/com/saveunhappy/saitama/antlr"]
+    arguments += ["-visitor", "-long-messages","-lib","src/main/antlr/com/saveunhappy/saitama/antlr"]
+//    arguments <<  << "src/main/antlr/org/jbduncan"
     // Keep a copy of generated sources
     doLast {
         println "Copying generated grammar lexer/parser files to main directory."
